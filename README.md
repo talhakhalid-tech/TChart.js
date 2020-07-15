@@ -11,3 +11,10 @@ TChart.js is a canvas based simple Javascript Bar and Line Chart Library to prov
 !["BarChart"](TChart-BarChart.JPG)
 
 !["LineChart"](TChart-LineChart.JPG)
+
+## Installation
+Download the `bar.min.js` and include it in your project
+
+```html
+<script src="bar.min.js"></script>
+```
