@@ -8,10 +8,6 @@ simple and configurable Bar and Line Chart library in Javascript
 ## Description
 TChart.js is a canvas based simple Javascript Bar and Line Chart Library to provide simple, configurable and dependency-free experience.
 
-!["BarChart"](TChart-BarChart.JPG)
-
-!["LineChart"](TChart-LineChart.JPG)
-
 ## Installation
 Download the `bar.min.js` and include it in your project
 
@@ -33,7 +29,7 @@ Then you can create the TChart object in your Javascipt file.
 let chart = new TChart(chartId, chartWidth, chartHeight, data);
 ```
 
-### Paraameters
+### Parameters
 - `chartId - containerId (String)`
 Defines the id of container like "chart"
 
@@ -59,9 +55,30 @@ let data = [
     { label: "Sep", value: 77 },
   ];
 ```
+### Drawing Chart
+
+After Creating TChart object call methods for creating Line or Bar Chart.
+
+#### For Bar Chart:
+
+```js
+chart.drawBarChart()
+```
+
+!["BarChart"](TChart-BarChart.JPG)
+
+
+#### For Line Chart:
+
+```js
+chart.drawLineChart()
+```
+!["LineChart"](TChart-LineChart.JPG)
+
+
 
 ## License
-[MIT](LICENSE.md) (c) [M.Talha Khalid](https://github.com/talhakhalid-tech)
+[MIT](LICENSE.md) © [M.Talha Khalid](https://github.com/talhakhalid-tech)
 
 
 
