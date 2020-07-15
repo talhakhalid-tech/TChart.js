@@ -2,12 +2,12 @@
  *
  * TChart.js
  * simple, elegant bar chart library
- * {date} - version 1.0
- * {url}
+ * 14-JULY-2020 - version 1.0
+ * https://github.com/talhakhalid-tech/TChart.js
  *
  * Copyright 2020 M.Talha Khalid
  * Release under the MIT License
- * {license url}
+ * https://github.com/talhakhalid-tech/TChart.js/blob/master/LICENSE.md
  *
  */
 
