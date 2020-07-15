@@ -2,12 +2,12 @@
  *
  * TChart.js
  * simple, elegant bar chart library
- * 14-JULY-2020 - version 1.0
- * https://github.com/talhakhalid-tech/TChart.js
+ * {date} - version 1.0
+ * {url}
  *
  * Copyright 2020 M.Talha Khalid
  * Release under the MIT License
- * https://github.com/talhakhalid-tech/TChart.js/blob/master/LICENSE.md
+ * {license url}
  *
  */
 
@@ -80,7 +80,7 @@ class TChart {
     this.horizontalLabelFreq = this.horizontalAxisWidth / (this.itemsNumber);
   }
 
-  drawChart() {
+  drawBarChart() {
 
     //vertical axis
     this.drawVerticalAxis();
@@ -99,6 +99,27 @@ class TChart {
 
     //bars
     this.drawBars();
+  }
+
+  drawLineChart() {
+
+    //vertical axis
+    this.drawVerticalAxis();
+
+    //vertical labels
+    this.drawVerticalLabels();
+
+    //horizontal axis
+    this.drawHorizontalAxis();
+
+    //horizontal labels
+    this.drawHorizontalLabels();
+
+    //horizontal guidelines
+    this.drawHorizontalGuidelines();
+
+    //bars
+    this.drawLines();
   }
 
   drawVerticalAxis() {
@@ -229,6 +250,37 @@ class TChart {
     const green = getRandomInt(0, 257);
     const blue = getRandomInt(0, 257);
     return { red, green, blue };
+  }
+
+  drawLines() {
+
+    for (let i = 0; i < this.itemsNumber; i++) {
+
+
+      this.context.beginPath()
+
+      let barX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / 2;
+      let barY = (this.height - this.verticalMargin) + (-1 * (this.verticalAxisWidth * this.values[i] / this.verticalUpperBound));
+
+      this.context.fillStyle = this.fontColor;
+      this.context.arc(barX, barY, this.horizontalLabelFreq / 9, 0, Math.PI * 2);
+      this.context.fill();
+    }
+
+    this.context.beginPath()
+    this.context.moveTo(this.horizontalMargin, this.height - this.verticalMargin)
+    this.context.strokeStyle = this.fontColor
+
+    for (let i = 0; i < this.itemsNumber; i++) {
+
+      let barX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / 2;
+      let barY = (this.height - this.verticalMargin) + (-1 * (this.verticalAxisWidth * this.values[i] / this.verticalUpperBound));
+
+      this.context.lineWidth = (this.axisWidth / ((this.itemsNumber - i) * 2)) * 2
+      this.context.lineTo(barX, barY)
+      this.context.stroke();
+    }
+
   }
 
 }

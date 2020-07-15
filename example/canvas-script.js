@@ -23,12 +23,19 @@ window.onload = function () {
     { label: "Sep", value: getRandomInt(min, max) },
   ];
 
-  let targetId = "chart";
-  let canvasWidth = 900;
-  let canvasHeight = 600;
+  let targetId1 = "barChart";
+  let canvas1Width = 600;
+  let canvas1Height = 450;
 
-  let chart = new TChart(targetId, canvasWidth, canvasHeight, data);
-  chart.drawChart()
+  let targetId2 = "lineChart";
+  let canvas2Width = 600;
+  let canvas2Height = 450;
+
+  let chart1 = new TChart(targetId1, canvas1Width, canvas1Height, data);
+  chart1.drawLineChart()
+
+  let chart2 = new TChart(targetId2, canvas2Width, canvas2Height, data);
+  chart2.drawBarChart()
 
 
 }
