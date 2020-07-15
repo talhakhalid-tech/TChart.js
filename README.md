@@ -9,10 +9,10 @@ simple and configurable Bar and Line Chart library in Javascript
 TChart.js is a canvas based simple Javascript Bar and Line Chart Library to provide simple, configurable and dependency-free experience.
 
 ## Installation
-Download the `bar.min.js` and include it in your project
+Download the `TChart.min.js` and include it in your project
 
 ```html
-<script src="bar.min.js"></script>
+<script src="TChart.min.js"></script>
 ```
 
 ## Usage
