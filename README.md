@@ -1,5 +1,5 @@
 # TChart.js
-simple and configurable Bar and Line Chart library in Javascript
+Simple and configurable Bar and Line Chart library in Javascript
 
 ![GitHub](https://img.shields.io/github/license/talhakhalid-tech/TChart.js)
 ![GitHub last commit](https://img.shields.io/github/last-commit/talhakhalid-tech/TChart.js)
