@@ -22,18 +22,37 @@ To create a Bar or Line chart, you'll need a block level container e.g 'div'.
   This will be our chart!
 </div>
 ```
-Then you can create the TChart object in your Javascipt file.
+
+Then you can create the TChart object in your Javascipt file.  
+  
+Minimum required options:
 
 ```js
 var chart = new TChart({
 	targetId: "myChart",
-	width: 600,
-	height: 450,
-	data: data
+	data: [10, 10, 15, 5, 10, 10]
 });
 ```
 
-### Parameters
+All currently available options:
+
+```js
+var chart = new TChart({
+	targetId: "lineChart2",
+	data: data,
+	color: "#f00",
+	width: 320,
+	height: 240,
+	drawGuidelines: false,
+	drawLabels: false,
+	drawAxisX: false,
+	drawAxisY: false,	
+	maxValue: 220,
+	minValue: 0
+});
+```
+
+### Options
 - `targetId - containerId (String)`
 Defines the id of container like "chart"
 
@@ -43,8 +62,8 @@ Defines the width of chart like 600
 - `height (Integer)`
 Defines the Height of chart like 450
 
-- `data (Objects Array)`
-Defines the data objects. The objects should have 2 key-value pairs: label and value. Example data:
+- `data (Objects Array or Number Array)`
+Defines the data objects. Use simple array of numbers (y-values) or objects with the key-value pairs 'label' and 'value' . Example object data:
 
 ```js
 var data = [
@@ -56,9 +75,12 @@ var data = [
     { label: "June", value: 129 },
     { label: "July", value: 198 },
     { label: "Aug", value: 256 },
-    { label: "Sep", value: 77 },
-  ];
+    { label: "Sep", value: 77 }
+];
 ```
+
+**TODO:** Document all options
+
 ### Drawing Chart
 
 After Creating TChart object call methods for creating Line or Bar Chart.
@@ -79,7 +101,12 @@ chart.drawLineChart()
 ```
 !["LineChart"](TChart-LineChart.JPG)
 
+### To-Do/Roadmap
 
+* Draw new data in existing chart (for fast updates)
+* Add more options
+* Optimize class structure (add prototypes etc.)
+* tbd
 
 ## License
 [MIT](LICENSE.md) © [M.Talha Khalid](https://github.com/talhakhalid-tech)  
