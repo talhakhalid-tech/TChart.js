@@ -4,7 +4,25 @@
 <head>
   <meta charset="UTF-8" />
   <title>Project: Open Source Bar Chart Library</title>
-  <link rel="stylesheet" href="style.css" />
+  
+  <style>
+	* {
+		box-sizing: border-box;
+	}
+	html, body {
+		margin: 0;
+		padding: 0;
+		font-family: sans-serif;
+	}
+	#lineChart{
+		width: 600px;
+		height: 450px;
+	}
+	#barChart{
+		width: 600px;
+		height: 450px;
+	}
+  </style>
 </head>
 
 <body>
@@ -18,7 +36,57 @@
   </div>
 
   <script src="TChart.js"></script>
-  <script src="canvas-script.js"></script>
+  <script>
+  
+	function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+window.onload = function() {
+
+    let min = 1;
+    let max = 200;
+
+    let data = [{
+            label: "Jan",   value: getRandomInt(min, max)
+        },{
+            label: "Feb",   value: getRandomInt(min, max)
+        },{
+            label: "March", value: getRandomInt(min, max)
+        },{
+            label: "April", value: getRandomInt(min, max)
+        },{
+            label: "May",   value: getRandomInt(min, max)
+        },{
+            label: "June",  value: getRandomInt(min, max)
+        },{
+            label: "July",  value: getRandomInt(min, max)
+        },{
+            label: "Aug",   value: getRandomInt(min, max)
+        },{
+            label: "Sep",	value: getRandomInt(min, max)
+        },
+    ];
+
+    let chart1 = new TChart({
+        targetId: "lineChart",
+        width: Math.round(window.innerWidth / 3),
+        height: Math.round(window.innerHeight / 3),
+        data: data
+    });
+    chart1.drawLineChart();
+
+    let chart2 = new TChart({
+        targetId: "barChart",
+        width: Math.round(window.innerWidth / 3),
+        height: Math.round(window.innerHeight / 3),
+        data: data
+    });
+    chart2.drawBarChart();
+}
+  </script>
 </body>
 
 </html>

@@ -1,18 +1,17 @@
 # TChart.js
-Simple and configurable Bar and Line Chart library in Javascript
-
-![GitHub](https://img.shields.io/github/license/talhakhalid-tech/TChart.js)
-![GitHub last commit](https://img.shields.io/github/last-commit/talhakhalid-tech/TChart.js)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/talhakhalid-tech/TChart.js)
+Simple, lightweight (10kb) and configurable Bar and Line Chart library in Javascript.  
+  
+Forked from: [TChart.js by M.Talha Khalid](https://github.com/talhakhalid-tech)  
+Modified to work with IE11.
 
 ## Description
-TChart.js is a canvas based simple Javascript Bar and Line Chart Library to provide simple, configurable and dependency-free experience.
+TChart.js is a canvas based, super lightweight, easy to use Javascript Bar and Line Chart Library to provide a configurable and dependency-free experience.
 
 ## Installation
 Download the `TChart.min.js` and include it in your project
 
 ```html
-<script src="TChart.min.js"></script>
+<script src="TChart.js"></script>
 ```
 
 ## Usage
@@ -26,24 +25,29 @@ To create a Bar or Line chart, you'll need a block level container e.g 'div'.
 Then you can create the TChart object in your Javascipt file.
 
 ```js
-let chart = new TChart(chartId, chartWidth, chartHeight, data);
+var chart = new TChart({
+	targetId: "myChart",
+	width: 600,
+	height: 450,
+	data: data
+});
 ```
 
 ### Parameters
-- `chartId - containerId (String)`
+- `targetId - containerId (String)`
 Defines the id of container like "chart"
 
-- `chartWidth (Integer)`
+- `width (Integer)`
 Defines the width of chart like 600
 
-- `chartHeight (Integer)`
+- `height (Integer)`
 Defines the Height of chart like 450
 
 - `data (Objects Array)`
 Defines the data objects. The objects should have 2 key-value pairs: label and value. Example data:
 
 ```js
-let data = [
+var data = [
     { label: "Jan", value: 24 },
     { label: "Feb", value: 124 },
     { label: "March", value: 65 },
@@ -78,7 +82,8 @@ chart.drawLineChart()
 
 
 ## License
-[MIT](LICENSE.md) © [M.Talha Khalid](https://github.com/talhakhalid-tech)
+[MIT](LICENSE.md) © [M.Talha Khalid](https://github.com/talhakhalid-tech)  
+Modified for IE11 by FQ - bytemind.de
 
 
 
