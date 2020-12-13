@@ -9,18 +9,27 @@
  * Release under the MIT License
  * https://github.com/talhakhalid-tech/TChart.js/blob/master/LICENSE.md
  *
+ * Modified to work with IE11 by Florian Quirin - bytemind.de
+ *
  */
-
 "use strict";
 
-class TChart {
-  constructor(targetId, width, height, data) {
+function TChart(options) {
+
+    //common
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+    }
+
+    var that = this;
 
     //Canvas Specification came from outside
-    this.id = targetId;
-    this.width = width;
-    this.height = height;
-    this.data = data;
+    this.id = options.targetId;
+    this.width = options.width;
+    this.height = options.height;
+    this.data = options.data;
 
     //Axis Configurations
     this.axisRatio = 10; //In term of percentage
@@ -31,7 +40,7 @@ class TChart {
 
     //Label Configurations
     this.fontRatio = 2.5; //In term of percentage
-    this.fontFamily = "times";
+    this.fontFamily = "sans-serif";
     this.fontStyle = "normal";
     this.fontWeight = "300";
     this.fontColor = "darkgrey";
@@ -43,26 +52,23 @@ class TChart {
     this.guidelineWidth = 0.5;
 
     //Create Canvas
-    let canvas = document.createElement("canvas");
-    canvas.id = this.id + "-" + Math.random();
-    canvas.width = this.width;
-    canvas.height = this.height;
+    this.canvas = document.createElement("canvas");
+    this.canvas.id = this.id + "-" + Math.random();
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.context = this.canvas.getContext("2d");
 
     //Append canvas to target container
     document.getElementById(this.id).innerHTML = "";
-    document.getElementById(this.id).appendChild(canvas);
-
-    //Add canvas to chart object
-    this.canvas = canvas;
-    this.context = canvas.getContext("2d");
+    document.getElementById(this.id).appendChild(this.canvas);
 
     //Handle data
     this.labels = [];
     this.values = [];
 
-    this.data.forEach((element) => {
-      this.labels.push(element.label);
-      this.values.push(element.value);
+    this.data.forEach(function(element) {
+        that.labels.push(element.label);
+        that.values.push(element.value);
     });
 
     //Global variables
@@ -78,215 +84,196 @@ class TChart {
     this.verticalUpperBound = Math.ceil(this.maxValue / 10) * 10;
     this.verticalLabelFreq = this.verticalUpperBound / this.itemsNumber;
     this.horizontalLabelFreq = this.horizontalAxisWidth / (this.itemsNumber);
-  }
 
-  drawBarChart() {
+    this.drawBarChart = function() {
+        //vertical axis
+        drawVerticalAxis();
 
-    //vertical axis
-    this.drawVerticalAxis();
+        //vertical labels
+        drawVerticalLabels();
 
-    //vertical labels
-    this.drawVerticalLabels();
+        //horizontal axis
+        drawHorizontalAxis();
 
-    //horizontal axis
-    this.drawHorizontalAxis();
+        //horizontal labels
+        drawHorizontalLabels();
 
-    //horizontal labels
-    this.drawHorizontalLabels();
+        //horizontal guidelines
+        drawHorizontalGuidelines();
 
-    //horizontal guidelines
-    this.drawHorizontalGuidelines();
-
-    //bars
-    this.drawBars();
-  }
-
-  drawLineChart() {
-
-    //vertical axis
-    this.drawVerticalAxis();
-
-    //vertical labels
-    this.drawVerticalLabels();
-
-    //horizontal axis
-    this.drawHorizontalAxis();
-
-    //horizontal labels
-    this.drawHorizontalLabels();
-
-    //horizontal guidelines
-    this.drawHorizontalGuidelines();
-
-    //bars
-    this.drawLines();
-  }
-
-  drawVerticalAxis() {
-    //vertical axis
-    this.context.beginPath();
-    this.context.strokeStyle = this.axisColor;
-    this.context.lineWidth = this.axisWidth;
-    this.context.moveTo(this.horizontalMargin, this.verticalMargin);
-    this.context.lineTo(
-      this.horizontalMargin,
-      this.height - this.verticalMargin
-    );
-    this.context.stroke();
-
-  }
-
-  drawVerticalLabels() {
-
-    //text specifications
-    let labelFont = this.fontStyle + " " + this.fontWeight + " " + this.verticalFontSize + "px " + this.fontFamily
-    this.context.font = labelFont
-    this.context.fillStyle = this.fontColor
-    this.context.textAlign = "right"
-
-    //scale values
-    let scaledVerticalLabelFreq = (this.verticalAxisWidth / this.verticalUpperBound) * this.verticalLabelFreq
-
-    //draw labels
-    for (let i = 0; i <= this.itemsNumber; i++) {
-      let labelText = Math.ceil(this.verticalUpperBound - i * this.verticalLabelFreq);
-      let verticalLabelX = this.horizontalMargin - this.horizontalMargin / this.axisRatio;
-      let verticalLabelY = this.verticalMargin + i * scaledVerticalLabelFreq;
-
-      this.context.fillText(labelText, verticalLabelX, verticalLabelY)
-    }
-  }
-
-  drawHorizontalAxis() {
-
-    //horizontal axis
-    this.context.beginPath();
-    this.context.strokeStyle = this.axisColor;
-    this.context.lineWidth = this.axisWidth;
-    this.context.moveTo(
-      this.horizontalMargin,
-      this.height - this.verticalMargin
-    );
-    this.context.lineTo(
-      this.width - this.horizontalMargin,
-      this.height - this.verticalMargin
-    );
-    this.context.stroke();
-
-  }
-
-  drawHorizontalLabels() {
-    //text specifications
-    let labelFont = this.fontStyle + " " + this.fontWeight + " " + this.verticalFontSize + "px " + this.fontFamily
-    this.context.font = labelFont
-    this.context.fillStyle = this.fontColor
-    this.context.textAlign = "center"
-    this.context.textBaseline = "top"
-
-    //draw labels
-    for (let i = 0; i < this.itemsNumber; i++) {
-      let horizontalLabelX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / 2;
-      let horizontalLabelY = this.height - this.verticalMargin + this.verticalMargin / this.axisRatio;
-
-      this.context.fillText(this.labels[i], horizontalLabelX, horizontalLabelY)
-    }
-  }
-
-  drawHorizontalGuidelines() {
-
-    //specifications
-    this.context.strokeStyle = this.guidelineColor;
-    this.context.lineWidth = this.guidelineWidth;
-
-    //scale values
-    let scaledVerticalLabelFreq = (this.verticalAxisWidth / this.verticalUpperBound) * this.verticalLabelFreq;
-
-    //draw labels
-    for (let i = 0; i <= this.itemsNumber; i++) {
-
-      //start point coordinates
-      let horizontalGuidelineStartX = this.horizontalMargin;
-      let horizontalGuidelineStartY = this.verticalMargin + i * scaledVerticalLabelFreq;
-
-      //end point coordinates
-      let horizontalGuidelineEndX = this.horizontalMargin + this.horizontalAxisWidth;
-      let horizontalGuidelineEndY = this.verticalMargin + i * scaledVerticalLabelFreq;
-
-      this.context.beginPath();
-      this.context.moveTo(horizontalGuidelineStartX, horizontalGuidelineStartY);
-      this.context.lineTo(horizontalGuidelineEndX, horizontalGuidelineEndY);
-      this.context.stroke();
-    }
-  }
-
-  drawBars() {
-
-    let color = this.createRandomRGBColor();
-
-    for (let i = 0; i < this.itemsNumber; i++) {
-
-      let color = this.createRandomRGBColor();
-      let fillOpacity = "0.5";
-      let fillColor = "rgba(" + color.red + "," + color.green + "," + color.blue + "," + fillOpacity + ")";
-      let borderColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
-
-      this.context.beginPath()
-
-      let barX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / this.axisRatio * 2;
-      let barY = this.height - this.verticalMargin;
-      let barWidth = this.horizontalLabelFreq - 2 * this.horizontalLabelFreq / this.axisRatio * 2;
-      let barHeight = -1 * (this.verticalAxisWidth * this.values[i] / this.verticalUpperBound);
-
-      this.context.fillStyle = fillColor;
-      this.context.strokeStyle = borderColor;
-      this.context.rect(barX, barY, barWidth, barHeight);
-      this.context.fill();
-      this.context.stroke();
-    }
-  }
-
-  createRandomRGBColor() {
-    const red = getRandomInt(0, 257);
-    const green = getRandomInt(0, 257);
-    const blue = getRandomInt(0, 257);
-    return { red, green, blue };
-  }
-
-  drawLines() {
-
-    for (let i = 0; i < this.itemsNumber; i++) {
-
-
-      this.context.beginPath()
-
-      let barX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / 2;
-      let barY = (this.height - this.verticalMargin) + (-1 * (this.verticalAxisWidth * this.values[i] / this.verticalUpperBound));
-
-      this.context.fillStyle = this.fontColor;
-      this.context.arc(barX, barY, this.horizontalLabelFreq / 9, 0, Math.PI * 2);
-      this.context.fill();
+        //bars
+        drawBars();
     }
 
-    this.context.beginPath()
-    this.context.moveTo(this.horizontalMargin, this.height - this.verticalMargin)
-    this.context.strokeStyle = this.fontColor
+    this.drawLineChart = function() {
+        //vertical axis
+        drawVerticalAxis();
 
-    for (let i = 0; i < this.itemsNumber; i++) {
+        //vertical labels
+        drawVerticalLabels();
 
-      let barX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / 2;
-      let barY = (this.height - this.verticalMargin) + (-1 * (this.verticalAxisWidth * this.values[i] / this.verticalUpperBound));
+        //horizontal axis
+        drawHorizontalAxis();
 
-      this.context.lineWidth = (this.axisWidth / ((this.itemsNumber - i) * 2)) * 2
-      this.context.lineTo(barX, barY)
-      this.context.stroke();
+        //horizontal labels
+        drawHorizontalLabels();
+
+        //horizontal guidelines
+        drawHorizontalGuidelines();
+
+        //bars
+        drawLines();
     }
 
-  }
+    function drawVerticalAxis() {
+        //vertical axis
+        that.context.beginPath();
+        that.context.strokeStyle = that.axisColor;
+        that.context.lineWidth = that.axisWidth;
+        that.context.moveTo(that.horizontalMargin, that.verticalMargin);
+        that.context.lineTo(
+            that.horizontalMargin,
+            that.height - that.verticalMargin
+        );
+        that.context.stroke();
+    }
 
-}
+    function drawVerticalLabels() {
+        //text specifications
+        let labelFont = that.fontStyle + " " + that.fontWeight + " " + that.verticalFontSize + "px " + that.fontFamily
+        that.context.font = labelFont
+        that.context.fillStyle = that.fontColor
+        that.context.textAlign = "right"
 
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+        //scale values
+        let scaledVerticalLabelFreq = (that.verticalAxisWidth / that.verticalUpperBound) * that.verticalLabelFreq
+
+        //draw labels
+        for (let i = 0; i <= that.itemsNumber; i++) {
+            let labelText = Math.ceil(that.verticalUpperBound - i * that.verticalLabelFreq);
+            let verticalLabelX = that.horizontalMargin - that.horizontalMargin / that.axisRatio;
+            let verticalLabelY = that.verticalMargin + i * scaledVerticalLabelFreq;
+
+            that.context.fillText(labelText, verticalLabelX, verticalLabelY)
+        }
+    }
+
+    function drawHorizontalAxis() {
+        //horizontal axis
+        that.context.beginPath();
+        that.context.strokeStyle = that.axisColor;
+        that.context.lineWidth = that.axisWidth;
+        that.context.moveTo(
+            that.horizontalMargin,
+            that.height - that.verticalMargin
+        );
+        that.context.lineTo(
+            that.width - that.horizontalMargin,
+            that.height - that.verticalMargin
+        );
+        that.context.stroke();
+    }
+
+    function drawHorizontalLabels() {
+        //text specifications
+        let labelFont = that.fontStyle + " " + that.fontWeight + " " + that.verticalFontSize + "px " + that.fontFamily
+        that.context.font = labelFont
+        that.context.fillStyle = that.fontColor
+        that.context.textAlign = "center"
+        that.context.textBaseline = "top"
+
+        //draw labels
+        for (let i = 0; i < that.itemsNumber; i++) {
+            let horizontalLabelX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / 2;
+            let horizontalLabelY = that.height - that.verticalMargin + that.verticalMargin / that.axisRatio;
+
+            that.context.fillText(that.labels[i], horizontalLabelX, horizontalLabelY)
+        }
+    }
+
+    function drawHorizontalGuidelines() {
+        //specifications
+        that.context.strokeStyle = that.guidelineColor;
+        that.context.lineWidth = that.guidelineWidth;
+
+        //scale values
+        let scaledVerticalLabelFreq = (that.verticalAxisWidth / that.verticalUpperBound) * that.verticalLabelFreq;
+
+        //draw labels
+        for (let i = 0; i <= that.itemsNumber; i++) {
+
+            //start point coordinates
+            let horizontalGuidelineStartX = that.horizontalMargin;
+            let horizontalGuidelineStartY = that.verticalMargin + i * scaledVerticalLabelFreq;
+
+            //end point coordinates
+            let horizontalGuidelineEndX = that.horizontalMargin + that.horizontalAxisWidth;
+            let horizontalGuidelineEndY = that.verticalMargin + i * scaledVerticalLabelFreq;
+
+            that.context.beginPath();
+            that.context.moveTo(horizontalGuidelineStartX, horizontalGuidelineStartY);
+            that.context.lineTo(horizontalGuidelineEndX, horizontalGuidelineEndY);
+            that.context.stroke();
+        }
+    }
+
+    function drawBars() {
+        let color = that.createRandomRGBColor();
+		
+        for (let i = 0; i < that.itemsNumber; i++) {
+            let color = that.createRandomRGBColor();
+            let fillOpacity = "0.5";
+            let fillColor = "rgba(" + color.red + "," + color.green + "," + color.blue + "," + fillOpacity + ")";
+            let borderColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
+
+            that.context.beginPath()
+
+            let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / that.axisRatio * 2;
+            let barY = that.height - that.verticalMargin;
+            let barWidth = that.horizontalLabelFreq - 2 * that.horizontalLabelFreq / that.axisRatio * 2;
+            let barHeight = -1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound);
+
+            that.context.fillStyle = fillColor;
+            that.context.strokeStyle = borderColor;
+            that.context.rect(barX, barY, barWidth, barHeight);
+            that.context.fill();
+            that.context.stroke();
+        }
+    }
+
+    this.createRandomRGBColor = function() {
+        const red = getRandomInt(0, 257);
+        const green = getRandomInt(0, 257);
+        const blue = getRandomInt(0, 257);
+        return {
+            red: red,
+            green: green,
+            blue: blue
+        };
+    }
+
+    function drawLines() {
+        for (let i = 0; i < that.itemsNumber; i++) {
+            that.context.beginPath()
+
+            let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / 2;
+            let barY = (that.height - that.verticalMargin) + (-1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound));
+
+            that.context.fillStyle = that.fontColor;
+            that.context.arc(barX, barY, that.horizontalLabelFreq / 9, 0, Math.PI * 2);
+            that.context.fill();
+        }
+        that.context.beginPath()
+        that.context.moveTo(that.horizontalMargin, that.height - that.verticalMargin)
+        that.context.strokeStyle = that.fontColor
+
+        for (let i = 0; i < that.itemsNumber; i++) {
+            let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / 2;
+            let barY = (that.height - that.verticalMargin) + (-1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound));
+
+            that.context.lineWidth = (that.axisWidth / ((that.itemsNumber - i) * 2)) * 2
+            that.context.lineTo(barX, barY)
+            that.context.stroke();
+        }
+    }
 }
