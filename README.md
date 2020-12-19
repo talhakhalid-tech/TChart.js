@@ -2,8 +2,10 @@
 Simple, lightweight (10kb) and configurable Bar and Line Chart library in Javascript.  
   
 Forked from: [TChart.js by M.Talha Khalid](https://github.com/talhakhalid-tech)  
-Modified to work with IE11.
-
+Modified to work with IE11.  
+  
+This is work in progress (see roadmap). If you're looking for a lightweight, super fast, production ready library for timeseries data check out [uPlot](https://github.com/leeoniya/uPlot).
+  
 ## Description
 TChart.js is a canvas based, super lightweight, easy to use Javascript Bar and Line Chart Library to provide a configurable and dependency-free experience.
 
@@ -103,6 +105,7 @@ chart.drawLineChart()
 
 ### To-Do/Roadmap
 
+* **Properly support negative values (O_O)**
 * Draw new data in existing chart (for fast updates)
 * Add more options
 * Optimize class structure (add prototypes etc.)

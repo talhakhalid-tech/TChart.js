@@ -32,6 +32,7 @@ var TChart = function(options) {
 	targetElement.style.alignContent = "center";
 	targetElement.style.justifyContent = "center";
 	targetElement.style.overflow = "hidden";
+	if (!targetElement.style.position) targetElement.style.position = "relative";
 	
     this.id = options.targetId;
     this.width = options.width || targetElementSize.width;
@@ -59,14 +60,15 @@ var TChart = function(options) {
     this.guidelineWidth = 0.5;
 
     //Create Canvas
-    var canvas = document.createElement("canvas");
-    canvas.width = this.width;
-    canvas.height = this.height;
+    var canvas = this.createCanvas(1);
     var ctx = canvas.getContext("2d");
+	var canvas2 = this.createCanvas(2);
+    var ctx2 = canvas2.getContext("2d");
 
     //Append canvas to target container
     targetElement.innerHTML = "";
     targetElement.appendChild(canvas);
+	targetElement.appendChild(canvas2);
 
     //Handle data
     this.labels = [];
@@ -210,58 +212,65 @@ var TChart = function(options) {
     }
 
     function drawBars() {
+		let fillColorGlobal = options.color;
+		let borderColorGlobal = options.color;
 		let fillOpacity = "0.75";
-		let fillColor, borderColor;
         for (let i = 0; i < that.itemsNumber; i++) {
-			if (options.color){
-				fillColor = options.color;
-				borderColor = options.color;
-			}else{
-				let color = TChart.createRandomRGBColor();
-				fillColor = "rgba(" + color.red + "," + color.green + "," + color.blue + "," + fillOpacity + ")";
-				borderColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
-			}
+			let color = TChart.createRandomRGBColor();
+			let fillColor = fillColorGlobal || ("rgba(" + color.red + "," + color.green + "," + color.blue + "," + fillOpacity + ")");
+			let borderColor = borderColorGlobal || ("rgb(" + color.red + "," + color.green + "," + color.blue + ")");
 
-            ctx.beginPath();
+            ctx2.beginPath();
 
             let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / that.axisRatio * 2;
             let barY = that.height - that.verticalMargin;
             let barWidth = that.horizontalLabelFreq - 2 * that.horizontalLabelFreq / that.axisRatio * 2;
             let barHeight = -1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound);
 
-            ctx.fillStyle = fillColor;
-            ctx.strokeStyle = borderColor;
-            ctx.rect(barX, barY, barWidth, barHeight);
-            ctx.fill();
-            ctx.stroke();
+            ctx2.fillStyle = fillColor;
+            ctx2.strokeStyle = borderColor;
+            ctx2.rect(barX, barY, barWidth, barHeight);
+            ctx2.fill();
+            ctx2.stroke();
         }
     }
 
     function drawLines() {
         for (let i = 0; i < that.itemsNumber; i++) {
-            ctx.beginPath()
+            ctx2.beginPath()
 
             let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / 2;
             let barY = (that.height - that.verticalMargin) + (-1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound));
 
-            ctx.fillStyle = that.fontColor;
-            ctx.arc(barX, barY, that.horizontalLabelFreq / 9, 0, Math.PI * 2);
-            ctx.fill();
+            ctx2.fillStyle = options.color || that.fontColor;
+            ctx2.arc(barX, barY, that.horizontalLabelFreq / 9, 0, Math.PI * 2);
+            ctx2.fill();
         }
-        ctx.beginPath();
-        ctx.moveTo(that.horizontalMargin, that.height - that.verticalMargin);
-        ctx.strokeStyle = options.color || that.fontColor;
+        ctx2.beginPath();
+        ctx2.moveTo(that.horizontalMargin, that.height - that.verticalMargin);
+        ctx2.strokeStyle = options.color || that.fontColor;
 
         for (let i = 0; i < that.itemsNumber; i++) {
             let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / 2;
             let barY = (that.height - that.verticalMargin) + (-1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound));
 
-            ctx.lineWidth = (that.axisWidth / ((that.itemsNumber - i) * 2)) * 2;
-            ctx.lineTo(barX, barY);
-            ctx.stroke();
+            ctx2.lineWidth = (that.axisWidth / ((that.itemsNumber - i) * 2)) * 2;
+            ctx2.lineTo(barX, barY);
+            ctx2.stroke();
         }
     }
 };
+
+TChart.prototype.createCanvas = function(zIndex){
+	var canvas = document.createElement("canvas");
+    canvas.width = this.width;
+    canvas.height = this.height;
+	canvas.style.position = "absolute";
+	//canvas.style.top = 0;
+	//canvas.style.left = 0;
+	canvas.style.zIndex = zIndex;
+	return canvas;
+}
 
 //common
 
