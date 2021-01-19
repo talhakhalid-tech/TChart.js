@@ -1,24 +1,123 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="UTF-8" />
-  <title>Project: Open Source Bar Chart Library</title>
-  <link rel="stylesheet" href="style.css" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Project: Open Source Bar Chart Library</title>
+	
+	<script src="../src/TChart.js"></script>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			font-family: sans-serif;
+		}
+		#charts {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			flex-wrap: wrap;
+		}
+		.chart{
+			display: flex;
+			flex: 1 1 auto;
+			width: 50%;
+			height: 50%;
+			margin: 0;
+			border: 1px solid black;
+			overflow: hidden;
+		}
+	</style>
 </head>
-
 <body>
-  <div id="chart">
-    <div id="barChart">
-      This Will Be Our Bar Chart
-    </div>
-    <div id="lineChart">
-      This Will Be Our line Chart
-    </div>
-  </div>
+	<div id="charts">
+		<div class="chart" id="barChart1">This will be bar-chart 1</div>
+		<div class="chart" id="barChart2">This will be bar-chart 2</div>
+		<div class="chart" id="lineChart1">This will be line-chart 1</div>
+		<div class="chart" id="lineChart2">This will be line-chart 2</div>
+	</div>
+	<script>
 
-  <script src="TChart.js"></script>
-  <script src="canvas-script.js"></script>
+	window.onload = function() {
+		var min = 0;
+		var max = 200;
+
+		var data1 = [{
+				label: "Jan",   value: TChart.getRandomInt(min, max)
+			},{
+				label: "Feb",   value: TChart.getRandomInt(min, max)
+			},{
+				label: "March", value: TChart.getRandomInt(min, max)
+			},{
+				label: "April", value: TChart.getRandomInt(min, max)
+			},{
+				label: "May",   value: TChart.getRandomInt(min, max)
+			},{
+				label: "June",  value: TChart.getRandomInt(min, max)
+			},{
+				label: "July",  value: TChart.getRandomInt(min, max)
+			},{
+				label: "Aug",   value: TChart.getRandomInt(min, max)
+			},{
+				label: "Sep",	value: TChart.getRandomInt(min, max)
+			},
+		];
+		var data2 = [
+			TChart.getRandomInt(min, max),
+			TChart.getRandomInt(min, max),
+			TChart.getRandomInt(min, max),
+			TChart.getRandomInt(min, max),
+			TChart.getRandomInt(min, max),
+			TChart.getRandomInt(min, max),
+			TChart.getRandomInt(min, max),
+			TChart.getRandomInt(min, max),
+			TChart.getRandomInt(min, max)
+		];
+
+		var chart1 = new TChart({
+			targetId: "lineChart1",
+			color: "#f00",
+			data: data1,
+			maxValue: 220,
+			minValue: 0
+		});
+		chart1.drawLineChart();
+
+		var chart2 = new TChart({
+			targetId: "barChart1",
+			width: Math.round(window.innerWidth / 3),
+			height: Math.round(window.innerHeight / 3),
+			drawGuidelines: false,
+			drawLabels: false,
+			drawAxisX: false,
+			drawAxisY: false,
+			color: "#f00",
+			data: data1
+		});
+		chart2.drawBarChart();
+		
+		var chart3 = new TChart({
+			targetId: "lineChart2",
+			width: 320,
+			height: 240,
+			drawGuidelines: false,
+			drawLabels: false,
+			data: data2,
+			maxValue: 220
+		});
+		chart3.drawLineChart();
+
+		var chart4 = new TChart({
+			targetId: "barChart2",
+			data: data2
+		});
+		chart4.drawBarChart();
+	}
+	</script>
 </body>
-
 </html>

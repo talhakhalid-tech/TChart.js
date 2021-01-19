@@ -1,7 +1,7 @@
 /**
  *
  * TChart.js
- * simple, elegant bar chart library
+ * Lightweight, elegant bar chart library
  * 14-JULY-2020 - version 1.0
  * https://github.com/talhakhalid-tech/TChart.js
  *
@@ -9,18 +9,35 @@
  * Release under the MIT License
  * https://github.com/talhakhalid-tech/TChart.js/blob/master/LICENSE.md
  *
+ * Modified to work with IE11 by Florian Quirin - bytemind.de
+ *
  */
-
 "use strict";
 
-class TChart {
-  constructor(targetId, width, height, data) {
+var TChart = function(options) {
+	
+	var that = this;
+	
+	//options
+	var drawLabels = (options.drawLabels != undefined)? options.drawLabels : true;
+	var drawGuidelines = (options.drawGuidelines != undefined)? options.drawGuidelines : true;
+	var drawAxisX = (options.drawAxisX != undefined)? options.drawAxisX : true;
+	var drawAxisY = (options.drawAxisY != undefined)? options.drawAxisY : true;
 
     //Canvas Specification came from outside
-    this.id = targetId;
-    this.width = width;
-    this.height = height;
-    this.data = data;
+	var targetElement = document.getElementById(options.targetId);
+	var targetElementSize = targetElement.getBoundingClientRect();
+	targetElement.style.display = "flex";
+	targetElement.style.alignItems = "center";
+	targetElement.style.alignContent = "center";
+	targetElement.style.justifyContent = "center";
+	targetElement.style.overflow = "hidden";
+	if (!targetElement.style.position) targetElement.style.position = "relative";
+	
+    this.id = options.targetId;
+    this.width = options.width || targetElementSize.width;
+    this.height = options.height || targetElementSize.height;
+    this.data = options.data;
 
     //Axis Configurations
     this.axisRatio = 10; //In term of percentage
@@ -31,10 +48,10 @@ class TChart {
 
     //Label Configurations
     this.fontRatio = 2.5; //In term of percentage
-    this.fontFamily = "times";
+    this.fontFamily = "sans-serif";
     this.fontStyle = "normal";
     this.fontWeight = "300";
-    this.fontColor = "darkgrey";
+    this.fontColor = "#555";
     this.verticalFontSize = (this.height * this.fontRatio) / 100;
     this.horizontalFontSize = (this.width * this.fontRatio) / 100;
 
@@ -43,32 +60,36 @@ class TChart {
     this.guidelineWidth = 0.5;
 
     //Create Canvas
-    let canvas = document.createElement("canvas");
-    canvas.id = this.id + "-" + Math.random();
-    canvas.width = this.width;
-    canvas.height = this.height;
+    var canvas = this.createCanvas(1);
+    var ctx = canvas.getContext("2d");
+	var canvas2 = this.createCanvas(2);
+    var ctx2 = canvas2.getContext("2d");
 
     //Append canvas to target container
-    document.getElementById(this.id).innerHTML = "";
-    document.getElementById(this.id).appendChild(canvas);
-
-    //Add canvas to chart object
-    this.canvas = canvas;
-    this.context = canvas.getContext("2d");
+    targetElement.innerHTML = "";
+    targetElement.appendChild(canvas);
+	targetElement.appendChild(canvas2);
 
     //Handle data
     this.labels = [];
     this.values = [];
 
-    this.data.forEach((element) => {
-      this.labels.push(element.label);
-      this.values.push(element.value);
-    });
+    if (this.data.length > 0 && typeof this.data[0] == "object"){
+		this.data.forEach(function(element, i) {
+			that.labels.push(element.label || i);
+			that.values.push(element.value);
+		});
+	}else{
+		this.data.forEach(function(element, i){
+			that.labels.push(i);
+			that.values.push(element);
+		});
+	}
 
     //Global variables
     this.itemsNumber = this.data.length;
-    this.maxValue = Math.max.apply(null, this.values);
-    this.minValue = Math.min.apply(null, this.values);
+    this.maxValue = (options.maxValue != undefined)? options.maxValue : Math.max.apply(null, this.values);
+    this.minValue = (options.minValue != undefined)? options.minValue : Math.min.apply(null, this.values);
 
     //Axis specifications
     this.verticalAxisWidth = this.height - 2 * this.verticalMargin;
@@ -78,215 +99,193 @@ class TChart {
     this.verticalUpperBound = Math.ceil(this.maxValue / 10) * 10;
     this.verticalLabelFreq = this.verticalUpperBound / this.itemsNumber;
     this.horizontalLabelFreq = this.horizontalAxisWidth / (this.itemsNumber);
-  }
 
-  drawBarChart() {
-
-    //vertical axis
-    this.drawVerticalAxis();
-
-    //vertical labels
-    this.drawVerticalLabels();
-
-    //horizontal axis
-    this.drawHorizontalAxis();
-
-    //horizontal labels
-    this.drawHorizontalLabels();
-
-    //horizontal guidelines
-    this.drawHorizontalGuidelines();
-
-    //bars
-    this.drawBars();
-  }
-
-  drawLineChart() {
-
-    //vertical axis
-    this.drawVerticalAxis();
-
-    //vertical labels
-    this.drawVerticalLabels();
-
-    //horizontal axis
-    this.drawHorizontalAxis();
-
-    //horizontal labels
-    this.drawHorizontalLabels();
-
-    //horizontal guidelines
-    this.drawHorizontalGuidelines();
-
-    //bars
-    this.drawLines();
-  }
-
-  drawVerticalAxis() {
-    //vertical axis
-    this.context.beginPath();
-    this.context.strokeStyle = this.axisColor;
-    this.context.lineWidth = this.axisWidth;
-    this.context.moveTo(this.horizontalMargin, this.verticalMargin);
-    this.context.lineTo(
-      this.horizontalMargin,
-      this.height - this.verticalMargin
-    );
-    this.context.stroke();
-
-  }
-
-  drawVerticalLabels() {
-
-    //text specifications
-    let labelFont = this.fontStyle + " " + this.fontWeight + " " + this.verticalFontSize + "px " + this.fontFamily
-    this.context.font = labelFont
-    this.context.fillStyle = this.fontColor
-    this.context.textAlign = "right"
-
-    //scale values
-    let scaledVerticalLabelFreq = (this.verticalAxisWidth / this.verticalUpperBound) * this.verticalLabelFreq
-
-    //draw labels
-    for (let i = 0; i <= this.itemsNumber; i++) {
-      let labelText = Math.ceil(this.verticalUpperBound - i * this.verticalLabelFreq);
-      let verticalLabelX = this.horizontalMargin - this.horizontalMargin / this.axisRatio;
-      let verticalLabelY = this.verticalMargin + i * scaledVerticalLabelFreq;
-
-      this.context.fillText(labelText, verticalLabelX, verticalLabelY)
+	//Draw Bar-Chart
+    this.drawBarChart = function() {
+        if (drawAxisY) 		drawVerticalAxis();
+        if (drawLabels) 	drawVerticalLabels();
+        if (drawAxisX) 		drawHorizontalAxis();
+        if (drawLabels) 	drawHorizontalLabels();
+        if (drawGuidelines) drawHorizontalGuidelines();
+        drawBars();
     }
-  }
-
-  drawHorizontalAxis() {
-
-    //horizontal axis
-    this.context.beginPath();
-    this.context.strokeStyle = this.axisColor;
-    this.context.lineWidth = this.axisWidth;
-    this.context.moveTo(
-      this.horizontalMargin,
-      this.height - this.verticalMargin
-    );
-    this.context.lineTo(
-      this.width - this.horizontalMargin,
-      this.height - this.verticalMargin
-    );
-    this.context.stroke();
-
-  }
-
-  drawHorizontalLabels() {
-    //text specifications
-    let labelFont = this.fontStyle + " " + this.fontWeight + " " + this.verticalFontSize + "px " + this.fontFamily
-    this.context.font = labelFont
-    this.context.fillStyle = this.fontColor
-    this.context.textAlign = "center"
-    this.context.textBaseline = "top"
-
-    //draw labels
-    for (let i = 0; i < this.itemsNumber; i++) {
-      let horizontalLabelX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / 2;
-      let horizontalLabelY = this.height - this.verticalMargin + this.verticalMargin / this.axisRatio;
-
-      this.context.fillText(this.labels[i], horizontalLabelX, horizontalLabelY)
-    }
-  }
-
-  drawHorizontalGuidelines() {
-
-    //specifications
-    this.context.strokeStyle = this.guidelineColor;
-    this.context.lineWidth = this.guidelineWidth;
-
-    //scale values
-    let scaledVerticalLabelFreq = (this.verticalAxisWidth / this.verticalUpperBound) * this.verticalLabelFreq;
-
-    //draw labels
-    for (let i = 0; i <= this.itemsNumber; i++) {
-
-      //start point coordinates
-      let horizontalGuidelineStartX = this.horizontalMargin;
-      let horizontalGuidelineStartY = this.verticalMargin + i * scaledVerticalLabelFreq;
-
-      //end point coordinates
-      let horizontalGuidelineEndX = this.horizontalMargin + this.horizontalAxisWidth;
-      let horizontalGuidelineEndY = this.verticalMargin + i * scaledVerticalLabelFreq;
-
-      this.context.beginPath();
-      this.context.moveTo(horizontalGuidelineStartX, horizontalGuidelineStartY);
-      this.context.lineTo(horizontalGuidelineEndX, horizontalGuidelineEndY);
-      this.context.stroke();
-    }
-  }
-
-  drawBars() {
-
-    let color = this.createRandomRGBColor();
-
-    for (let i = 0; i < this.itemsNumber; i++) {
-
-      let color = this.createRandomRGBColor();
-      let fillOpacity = "0.5";
-      let fillColor = "rgba(" + color.red + "," + color.green + "," + color.blue + "," + fillOpacity + ")";
-      let borderColor = "rgb(" + color.red + "," + color.green + "," + color.blue + ")";
-
-      this.context.beginPath()
-
-      let barX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / this.axisRatio * 2;
-      let barY = this.height - this.verticalMargin;
-      let barWidth = this.horizontalLabelFreq - 2 * this.horizontalLabelFreq / this.axisRatio * 2;
-      let barHeight = -1 * (this.verticalAxisWidth * this.values[i] / this.verticalUpperBound);
-
-      this.context.fillStyle = fillColor;
-      this.context.strokeStyle = borderColor;
-      this.context.rect(barX, barY, barWidth, barHeight);
-      this.context.fill();
-      this.context.stroke();
-    }
-  }
-
-  createRandomRGBColor() {
-    const red = getRandomInt(0, 257);
-    const green = getRandomInt(0, 257);
-    const blue = getRandomInt(0, 257);
-    return { red, green, blue };
-  }
-
-  drawLines() {
-
-    for (let i = 0; i < this.itemsNumber; i++) {
-
-
-      this.context.beginPath()
-
-      let barX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / 2;
-      let barY = (this.height - this.verticalMargin) + (-1 * (this.verticalAxisWidth * this.values[i] / this.verticalUpperBound));
-
-      this.context.fillStyle = this.fontColor;
-      this.context.arc(barX, barY, this.horizontalLabelFreq / 9, 0, Math.PI * 2);
-      this.context.fill();
+	//Draw Line-Chart
+    this.drawLineChart = function() {
+        if (drawAxisY) 		drawVerticalAxis();
+        if (drawLabels) 	drawVerticalLabels();
+        if (drawAxisX) 		drawHorizontalAxis();
+        if (drawLabels) 	drawHorizontalLabels();
+        if (drawGuidelines) drawHorizontalGuidelines();
+        drawLines();
     }
 
-    this.context.beginPath()
-    this.context.moveTo(this.horizontalMargin, this.height - this.verticalMargin)
-    this.context.strokeStyle = this.fontColor
-
-    for (let i = 0; i < this.itemsNumber; i++) {
-
-      let barX = this.horizontalMargin + i * this.horizontalLabelFreq + this.horizontalLabelFreq / 2;
-      let barY = (this.height - this.verticalMargin) + (-1 * (this.verticalAxisWidth * this.values[i] / this.verticalUpperBound));
-
-      this.context.lineWidth = (this.axisWidth / ((this.itemsNumber - i) * 2)) * 2
-      this.context.lineTo(barX, barY)
-      this.context.stroke();
+    function drawVerticalAxis() {
+        //vertical axis
+        ctx.beginPath();
+        ctx.strokeStyle = that.axisColor;
+        ctx.lineWidth = that.axisWidth;
+        ctx.moveTo(that.horizontalMargin, that.verticalMargin);
+        ctx.lineTo(
+            that.horizontalMargin,
+            that.height - that.verticalMargin
+        );
+        ctx.stroke();
     }
 
-  }
+    function drawVerticalLabels() {
+        //text specifications
+        let labelFont = that.fontStyle + " " + that.fontWeight + " " + that.verticalFontSize + "px " + that.fontFamily;
+        ctx.font = labelFont;
+        ctx.fillStyle = that.fontColor;
+        ctx.textAlign = "right";
 
+        //scale values
+        let scaledVerticalLabelFreq = (that.verticalAxisWidth / that.verticalUpperBound) * that.verticalLabelFreq;
+
+        //draw labels
+        for (let i = 0; i <= that.itemsNumber; i++) {
+            let labelText = Math.ceil(that.verticalUpperBound - i * that.verticalLabelFreq);
+            let verticalLabelX = that.horizontalMargin - that.horizontalMargin / that.axisRatio;
+            let verticalLabelY = that.verticalMargin + i * scaledVerticalLabelFreq;
+
+            ctx.fillText(labelText, verticalLabelX, verticalLabelY);
+        }
+    }
+
+    function drawHorizontalAxis() {
+        //horizontal axis
+        ctx.beginPath();
+        ctx.strokeStyle = that.axisColor;
+        ctx.lineWidth = that.axisWidth;
+        ctx.moveTo(
+            that.horizontalMargin,
+            that.height - that.verticalMargin
+        );
+        ctx.lineTo(
+            that.width - that.horizontalMargin,
+            that.height - that.verticalMargin
+        );
+        ctx.stroke();
+    }
+
+    function drawHorizontalLabels() {
+        //text specifications
+        let labelFont = that.fontStyle + " " + that.fontWeight + " " + that.verticalFontSize + "px " + that.fontFamily;
+        ctx.font = labelFont;
+        ctx.fillStyle = that.fontColor;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+
+        //draw labels
+        for (let i = 0; i < that.itemsNumber; i++) {
+            let horizontalLabelX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / 2;
+            let horizontalLabelY = that.height - that.verticalMargin + that.verticalMargin / that.axisRatio;
+
+            ctx.fillText(that.labels[i], horizontalLabelX, horizontalLabelY);
+        }
+    }
+
+    function drawHorizontalGuidelines() {
+        //specifications
+        ctx.strokeStyle = that.guidelineColor;
+        ctx.lineWidth = that.guidelineWidth;
+
+        //scale values
+        let scaledVerticalLabelFreq = (that.verticalAxisWidth / that.verticalUpperBound) * that.verticalLabelFreq;
+
+        //draw labels
+        for (let i = 0; i <= that.itemsNumber; i++) {
+
+            //start point coordinates
+            let horizontalGuidelineStartX = that.horizontalMargin;
+            let horizontalGuidelineStartY = that.verticalMargin + i * scaledVerticalLabelFreq;
+
+            //end point coordinates
+            let horizontalGuidelineEndX = that.horizontalMargin + that.horizontalAxisWidth;
+            let horizontalGuidelineEndY = that.verticalMargin + i * scaledVerticalLabelFreq;
+
+            ctx.beginPath();
+            ctx.moveTo(horizontalGuidelineStartX, horizontalGuidelineStartY);
+            ctx.lineTo(horizontalGuidelineEndX, horizontalGuidelineEndY);
+            ctx.stroke();
+        }
+    }
+
+    function drawBars() {
+		let fillColorGlobal = options.color;
+		let borderColorGlobal = options.color;
+		let fillOpacity = "0.75";
+        for (let i = 0; i < that.itemsNumber; i++) {
+			let color = TChart.createRandomRGBColor();
+			let fillColor = fillColorGlobal || ("rgba(" + color.red + "," + color.green + "," + color.blue + "," + fillOpacity + ")");
+			let borderColor = borderColorGlobal || ("rgb(" + color.red + "," + color.green + "," + color.blue + ")");
+
+            ctx2.beginPath();
+
+            let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / that.axisRatio * 2;
+            let barY = that.height - that.verticalMargin;
+            let barWidth = that.horizontalLabelFreq - 2 * that.horizontalLabelFreq / that.axisRatio * 2;
+            let barHeight = -1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound);
+
+            ctx2.fillStyle = fillColor;
+            ctx2.strokeStyle = borderColor;
+            ctx2.rect(barX, barY, barWidth, barHeight);
+            ctx2.fill();
+            ctx2.stroke();
+        }
+    }
+
+    function drawLines() {
+        for (let i = 0; i < that.itemsNumber; i++) {
+            ctx2.beginPath()
+
+            let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / 2;
+            let barY = (that.height - that.verticalMargin) + (-1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound));
+
+            ctx2.fillStyle = options.color || that.fontColor;
+            ctx2.arc(barX, barY, that.horizontalLabelFreq / 9, 0, Math.PI * 2);
+            ctx2.fill();
+        }
+        ctx2.beginPath();
+        ctx2.moveTo(that.horizontalMargin, that.height - that.verticalMargin);
+        ctx2.strokeStyle = options.color || that.fontColor;
+
+        for (let i = 0; i < that.itemsNumber; i++) {
+            let barX = that.horizontalMargin + i * that.horizontalLabelFreq + that.horizontalLabelFreq / 2;
+            let barY = (that.height - that.verticalMargin) + (-1 * (that.verticalAxisWidth * that.values[i] / that.verticalUpperBound));
+
+            ctx2.lineWidth = (that.axisWidth / ((that.itemsNumber - i) * 2)) * 2;
+            ctx2.lineTo(barX, barY);
+            ctx2.stroke();
+        }
+    }
+};
+
+TChart.prototype.createCanvas = function(zIndex){
+	var canvas = document.createElement("canvas");
+    canvas.width = this.width;
+    canvas.height = this.height;
+	canvas.style.position = "absolute";
+	//canvas.style.top = 0;
+	//canvas.style.left = 0;
+	canvas.style.zIndex = zIndex;
+	return canvas;
 }
 
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-}
+//common
+
+TChart.getRandomInt = function(min, max){
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+};
+TChart.createRandomRGBColor = function(){
+	const red = TChart.getRandomInt(0, 257);
+	const green = TChart.getRandomInt(0, 257);
+	const blue = TChart.getRandomInt(0, 257);
+	return {
+		red: red,
+		green: green,
+		blue: blue
+	};
+};

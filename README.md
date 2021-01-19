@@ -1,18 +1,19 @@
 # TChart.js
-Simple and configurable Bar and Line Chart library in Javascript
-
-![GitHub](https://img.shields.io/github/license/talhakhalid-tech/TChart.js)
-![GitHub last commit](https://img.shields.io/github/last-commit/talhakhalid-tech/TChart.js)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/talhakhalid-tech/TChart.js)
-
+Simple, lightweight (10kb) and configurable Bar and Line Chart library in Javascript.  
+  
+Forked from: [TChart.js by M.Talha Khalid](https://github.com/talhakhalid-tech)  
+Modified to work with IE11.  
+  
+This is work in progress (see roadmap). If you're looking for a lightweight, super fast, production ready library for timeseries data check out [uPlot](https://github.com/leeoniya/uPlot).
+  
 ## Description
-TChart.js is a canvas based simple Javascript Bar and Line Chart Library to provide simple, configurable and dependency-free experience.
+TChart.js is a canvas based, super lightweight, easy to use Javascript Bar and Line Chart Library to provide a configurable and dependency-free experience.
 
 ## Installation
 Download the `TChart.min.js` and include it in your project
 
 ```html
-<script src="TChart.min.js"></script>
+<script src="TChart.js"></script>
 ```
 
 ## Usage
@@ -23,27 +24,51 @@ To create a Bar or Line chart, you'll need a block level container e.g 'div'.
   This will be our chart!
 </div>
 ```
-Then you can create the TChart object in your Javascipt file.
+
+Then you can create the TChart object in your Javascipt file.  
+  
+Minimum required options:
 
 ```js
-let chart = new TChart(chartId, chartWidth, chartHeight, data);
+var chart = new TChart({
+	targetId: "myChart",
+	data: [10, 10, 15, 5, 10, 10]
+});
 ```
 
-### Parameters
-- `chartId - containerId (String)`
-Defines the id of container like "chart"
-
-- `chartWidth (Integer)`
-Defines the width of chart like 600
-
-- `chartHeight (Integer)`
-Defines the Height of chart like 450
-
-- `data (Objects Array)`
-Defines the data objects. The objects should have 2 key-value pairs: label and value. Example data:
+All currently available options:
 
 ```js
-let data = [
+var chart = new TChart({
+	targetId: "lineChart2",
+	data: data,
+	color: "#f00",
+	width: 320,
+	height: 240,
+	drawGuidelines: false,
+	drawLabels: false,
+	drawAxisX: false,
+	drawAxisY: false,	
+	maxValue: 220,
+	minValue: 0
+});
+```
+
+### Options
+- `targetId - containerId (String)`
+Defines the id of container like "chart"
+
+- `width (Integer)`
+Defines the width of chart like 600
+
+- `height (Integer)`
+Defines the Height of chart like 450
+
+- `data (Objects Array or Number Array)`
+Defines the data objects. Use simple array of numbers (y-values) or objects with the key-value pairs 'label' and 'value' . Example object data:
+
+```js
+var data = [
     { label: "Jan", value: 24 },
     { label: "Feb", value: 124 },
     { label: "March", value: 65 },
@@ -52,9 +77,12 @@ let data = [
     { label: "June", value: 129 },
     { label: "July", value: 198 },
     { label: "Aug", value: 256 },
-    { label: "Sep", value: 77 },
-  ];
+    { label: "Sep", value: 77 }
+];
 ```
+
+**TODO:** Document all options
+
 ### Drawing Chart
 
 After Creating TChart object call methods for creating Line or Bar Chart.
@@ -75,10 +103,17 @@ chart.drawLineChart()
 ```
 !["LineChart"](TChart-LineChart.JPG)
 
+### To-Do/Roadmap
 
+* **Properly support negative values (O_O)**
+* Draw new data in existing chart (for fast updates)
+* Add more options
+* Optimize class structure (add prototypes etc.)
+* tbd
 
 ## License
-[MIT](LICENSE.md) © [M.Talha Khalid](https://github.com/talhakhalid-tech)
+[MIT](LICENSE.md) © [M.Talha Khalid](https://github.com/talhakhalid-tech)  
+Modified for IE11 by FQ - bytemind.de
 
 
 
