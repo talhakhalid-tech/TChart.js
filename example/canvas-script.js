@@ -1,4 +1,3 @@
-
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -6,8 +5,6 @@ function getRandomInt(min, max) {
 }
 
 window.onload = function () {
-
-
   let min = 1;
   let max = 200;
 
@@ -23,19 +20,17 @@ window.onload = function () {
     { label: "Sep", value: getRandomInt(min, max) },
   ];
 
-  let targetId1 = "barChart";
-  let canvas1Width = 600;
-  let canvas1Height = 450;
+  let targetId1 = "lineChart";
+  let canvas1Width = 1000;
+  let canvas1Height = 750;
 
-  let targetId2 = "lineChart";
-  let canvas2Width = 600;
-  let canvas2Height = 450;
+  let targetId2 = "barChart";
+  let canvas2Width = 1000;
+  let canvas2Height = 750;
 
   let chart1 = new TChart(targetId1, canvas1Width, canvas1Height, data);
-  chart1.drawLineChart()
+  chart1.drawLineChart({ animation: true });
 
   let chart2 = new TChart(targetId2, canvas2Width, canvas2Height, data);
-  chart2.drawBarChart()
-
-
-}
+  chart2.drawBarChart({ animation: true });
+};

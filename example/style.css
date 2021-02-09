@@ -1,14 +1,14 @@
 #chart {
-  width: 1200px;
-  height: 450px;
+  width: 2000px;
+  height: 750px;
   display: flex;
   flex-direction: row;
 }
-#lineChart{
-  width: 600px;
-  height: 450px;
+#lineChart {
+  width: 1000px;
+  height: 750px;
 }
-#barChart{
-  width: 600px;
-  height: 450px;
+#barChart {
+  width: 1000px;
+  height: 750px;
 }
