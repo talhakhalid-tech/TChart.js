@@ -29,8 +29,8 @@ window.onload = function () {
   let canvas2Height = 750;
 
   let chart1 = new TChart(targetId1, canvas1Width, canvas1Height, data);
-  chart1.drawLineChart({ animation: true });
+  chart1.drawLineChart();
 
   let chart2 = new TChart(targetId2, canvas2Width, canvas2Height, data);
-  chart2.drawBarChart({ animation: true });
+  chart2.drawBarChart();
 };

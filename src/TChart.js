@@ -385,8 +385,8 @@ class TChart {
       this.linePoints.push({
         xAxis: this.lineXArc,
         yAxis: this.lineYArc,
-        xVelocity: (this.lineXArc - this.lineCurrentPoint.xAxis) / 50,
-        yVelocity: (this.lineYArc - this.lineCurrentPoint.yAxis) / 50,
+        xVelocity: (this.lineXArc - this.lineCurrentPoint.xAxis) / 25,
+        yVelocity: (this.lineYArc - this.lineCurrentPoint.yAxis) / 25,
       });
 
       this.lineCurrentPoint.xAxis = this.lineXArc;
@@ -410,11 +410,13 @@ class TChart {
       this.linePointCount
     ].xVelocity;
     if (
-      (Math.round(this.lineCurrentPoint.yAxis * 1000) / 1000 <=
-        Math.round(this.linePoints[this.linePointCount].yAxis * 1000) / 1000 &&
+      (Math.round(this.lineCurrentPoint.yAxis * 10000) / 10000 <=
+        Math.round(this.linePoints[this.linePointCount].yAxis * 10000) /
+          10000 &&
         this.linePoints[this.linePointCount].yVelocity < 0) ||
-      (Math.round(this.lineCurrentPoint.yAxis * 1000) / 1000 >=
-        Math.round(this.linePoints[this.linePointCount].yAxis * 1000) / 1000 &&
+      (Math.round(this.lineCurrentPoint.yAxis * 10000) / 10000 >=
+        Math.round(this.linePoints[this.linePointCount].yAxis * 10000) /
+          10000 &&
         this.linePoints[this.linePointCount].yVelocity > 0)
     ) {
       this.context.beginPath();
